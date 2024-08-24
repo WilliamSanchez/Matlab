@@ -21,7 +21,7 @@ while sim_time < SIM.end_time
     elseif sim_time < 4*SIM.end_time/6
         state.phi = state.phi + SIM.ts_simulation;
     elseif sim_time < 5*SIM.end_time/6
-        state.tetha = state.tetha + SIM.ts_simulation;
+        state.theta = state.theta + SIM.ts_simulation;
     end   
 
     mav_viewer.update(state);
