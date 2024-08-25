@@ -6,5 +6,7 @@ function handle = drawRod(Y, tetha, L, gap, height, handle, mode)
        handle = plot(X,Y,'g');
        drawnow update
    else
-       set(handle, 'XData',X,'YData',Y);
+       %set(handle, 'XData',X,'YData',Y);
+       handle.XData=X;
+       handle.YData=Y;
    end

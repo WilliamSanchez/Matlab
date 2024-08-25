@@ -6,5 +6,8 @@ function handle = drawBase(y, width, height, gap, handle, mode)
        handle = fill(X,Y,'m');
        drawnow update
    else
-       set(handle, 'XData',X,'YData',Y);
+      % set(handle, 'XData',X,'YData',Y);       
+       handle.XData=X;
+       handle.YData=Y;
+
    end
