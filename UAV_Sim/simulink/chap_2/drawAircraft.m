@@ -33,7 +33,7 @@ function drawAircraft(uu)
         ylabel('North')
         zlabel('-Down')
         view(32,47)  % set the vieew angle for figure
-        axis([-10,10,-10,10,-10,10]);
+        axis([-100,100,-100,100,-500,500]);
         grid on
         hold on
         

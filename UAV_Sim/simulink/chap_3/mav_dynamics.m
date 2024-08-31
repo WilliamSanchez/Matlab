@@ -121,23 +121,16 @@ simStateCompliance = 'UnknownSimState';
 %
 function sys=mdlDerivatives(t,x,uu, MAV)
 
-    zagi = zagi_parameters();
+   mass = MAV.mass;
 
-    mass    = zagi.mass;
-    Jx      = zagi.Jx;
-    Jy      = zagi.Jy;
-    Jz      = zagi.Jz; 
-    Jxz     = zagi.Jxz;
-
-    rr = Jx*Jz-Jxz^2;    
-    r1 = Jxz*(Jx-Jy+Jz)/rr;
-    r2 = (Jz*(Jz-Jy)+Jxz^2)/rr;
-    r3 = Jz/rr;
-    r4 = Jxz/rr;
-    r5 = (Jz-Jx)/Jy;
-    r6 = Jxz/Jy;
-    r7 = (Jx*(Jx-Jy)+Jxz^2)/rr;
-    r8 = Jx/rr;
+    r1 = MAV.Gamma1;
+    r2 = MAV.Gamma2;
+    r3 = MAV.Gamma3;
+    r4 = MAV.Gamma4;
+    r5 = MAV.Gamma5;
+    r6 = MAV.Gamma6;
+    r7 = MAV.Gamma7;
+    r8 = MAV.Gamma8;
 
     pn    = x(1);
     pe    = x(2);
@@ -159,23 +152,23 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     m     = uu(5);
     n     = uu(6);
     
-    pndot = (e1^2+e0^2-e2^2-e3^2)*u+(2*(e1*e2-e3*e0))*v+(2*(e1*e3+e2*e0))*w;    
-    pedot = (2*(e(2)*e(3)+e(4)*e(1)))*u+(e(3)^2+e(1)^2-e(2)^2-e(4)^2)*v+(2*(e(3)*e(4)-e(2)*e(1)))*w;   
-    pddot = (2*(e(2)*e(4)-e(3)*e(1)))*u+(2*(e(3)*e(4)+e(2)*e(1)))*v+(e(4)^2+e(1)^2-e(2)^2-e(3)^2)*w;
-    
-    udot =  r*v-q*w+fx/mass;   
-    vdot =  p*w-r*u+fy/mass;   
-    wdot =  q*u-p*v+fz/mass;
-       
-    e0dot = 0.5*(-p*e1-q*e2-r*e3);
-    e1dot = 0.5*(p*e0+r*e2-q*e3);
-    e2dot = 0.5*(q*e0-r*e1+p*e3);
-    e3dot = 0.5*(r*e0+q*e1-p*e2);
-        
-    pdot = r1*p*q-r2*q*r+r3*l+r4*n;    
-    qdot = r5*p*r-r6*(p^2-r^2)+mass/Jy;
-    rdot = r7*p*q-r1*q*r+r4*l+r8*n;
-        
+     % position kinematics
+    pndot = (e1^2+e0^2-e2^2-e3^2)*u + 2*(e1*e2-e3*e0)*v + 2*(e1*e3+e2*e0)*w;    
+    pedot = 2*(e1*e2+e3*e0)*u + (e2^2+e0^2-e1^2-e3^2)*v + 2*(e2*e3-e1*e0)*w;   
+    pddot = -2*(e1*e3-e2*e0)*u - 2*(e2*e3+e1*e0)*v - (e3^2+e0^2-e1^2-e2^2)*w;
+    % position dynamics
+    udot =  r*v - q*w + fx/mass;   
+    vdot =  p*w - r*u + fy/mass;   
+    wdot =  q*u - p*v + fz/mass;
+    % rotational kinematics
+    e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
+    e1dot = 0.5*( p*e0 + r*e2 - q*e3);
+    e2dot = 0.5*( q*e0 - r*e1 + p*e3);
+    e3dot = 0.5*( r*e0 + q*e1 - p*e2);
+    % rotational dynamics
+    pdot = r1*p*q - r2*q*r + r3*ell + r4*n;    
+    qdot = r5*p*r - r6*(p^2 - r^2) + m/MAV.Jy;
+    rdot = r7*p*q - r1*q*r + r4*ell + r8*n;       
 
 sys = [pndot; pedot; pddot; udot; vdot; wdot; e0dot; e1dot; e2dot; e3dot; pdot; qdot; rdot];
 
@@ -214,7 +207,6 @@ function sys=mdlOutputs(t,x)
             x(10);
             x(11);
             x(12);
-            x(13);
         ];
 sys = y;
 
