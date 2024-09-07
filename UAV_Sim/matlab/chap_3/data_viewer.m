@@ -76,7 +76,7 @@ classdef data_viewer < handle
                     self.alpha_handle = self.graph_y_yhat(self.time, true.alpha, estimated.alpha, [],'\alpha');
                 subplot(4,4,7)
                     hold on
-                    self.theta_handle = self.graph_y_yhat_yd(self.time, true.theta, estimated.theta, commanded.theta, [],'\tetha');
+                    self.theta_handle = self.graph_y_yhat_yd(self.time, true.theta, estimated.theta, commanded.theta, [],'\theta');
                  subplot(4,4,8)
                     hold on
                     self.q_handle = self.graph_y_yhat(self.time, true.q, estimated.q, [],'q');

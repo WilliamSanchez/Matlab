@@ -16,10 +16,10 @@ classdef mav_dynamics < handle
             self.ts_simulation = Ts; % time step between function calls
             self.state = [MAV.pn0; MAV.pe0; MAV.pd0; MAV.u0; MAV.v0; MAV.w0;...
                 MAV.e0; MAV.e1; MAV.e2; MAV.e3; MAV.p0; MAV.q0; MAV.r0];
-            self.Va =
-            self.alpha = 
-            self.beta = 
-            self.wind = 
+            self.Va = 10;
+            self.alpha = 2; 
+            self.beta = 0.4;
+            self.wind = 0.2;
             addpath('../message_types'); self.true_state = msg_state();
         end
         %---------------------------
@@ -81,19 +81,23 @@ classdef mav_dynamics < handle
             ell   = forces_moments(4);
             m     = forces_moments(5);
             n     = forces_moments(6);
+            
             % position kinematics
             pndot = (e1^2+e0^2-e2^2-e3^2)*u + 2*(e1*e2-e3*e0)*v + 2*(e1*e3+e2*e0)*w;    
             pedot = 2*(e1*e2+e3*e0)*u + (e2^2+e0^2-e1^2-e3^2)*v + 2*(e2*e3-e1*e0)*w;   
             pddot = -2*(e1*e3-e2*e0)*u - 2*(e2*e3+e1*e0)*v - (e3^2+e0^2-e1^2-e2^2)*w;
+            
             % position dynamics
             udot =  r*v - q*w + fx/mass;   
             vdot =  p*w - r*u + fy/mass;   
             wdot =  q*u - p*v + fz/mass;
+            
             % rotational kinematics
             e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
             e1dot = 0.5*( p*e0 + r*e2 - q*e3);
             e2dot = 0.5*( q*e0 - r*e1 + p*e3);
             e3dot = 0.5*( r*e0 + q*e1 - p*e2);
+            
             % rotational dynamics
             pdot = r1*p*q - r2*q*r + r3*ell + r4*n;    
             qdot = r5*p*r - r6*(p^2 - r^2) + m/MAV.Jy;
@@ -104,20 +108,38 @@ classdef mav_dynamics < handle
         end
         %----------------------------
         function self=update_velocity_data(self, wind)
-            self.wind = 
-            self.Va = 
-            self.alpha = 
-            self.beta = 
+    
+            e0    = self.state(7);
+            e1    = self.state(8);
+            e2    = self.state(9);
+            e3    = self.state(10);
+
+            wn = wind(1);
+            wd = wind(2);
+            we = wind(3);
+
+            uw = (e0^2 + e1^2 - e2^2 - e3^2)*wn + 2*(e1*e2 + e0*e3)*wd + 2*(e1*e3 - e0*e2)*we + wind(4);
+            vw = 2*(e1*e2 - e0*e3)*wn + (e0^2 - e1^2 + e2^2 - e3^2)*wd + 2*(e0*e1 + e2*e3)*we + wind(5);
+            ww = 2*(e0*e2 + e1*e3)*wn + 2*(e2*e3 - e0*e1)*wd + (e0^2 - e1^2 - e2^2 + e3^2)*we + wind(6);
+
+            ur = self.state(4) - uw;
+            vr = self.state(5) - vw;
+            wr = self.state(6) - vw;
+
+            self.wind = [uw; vw; ww];	% body frame
+            self.Va = sqrt(ur^2 + vr^2 + wr^2);
+            self.alpha = atan2(wr,ur);
+            self.beta = asin(vr/sqrt(ur^2 + vr^2 + wr^2));
         end
         %----------------------------
         function out=forces_moments(self, delta, MAV)
     
             mass    = MAV.mass;
             
-            d_el    = delta.delta_e;
-            d_al    = delta.delta_a;
-            d_ru    = delta.delta_r;
-            d_th    = delta.delta_t;
+            d_el    = delta(1);
+            d_al    = delta(3);
+            d_ru    = delta(4);
+            d_th    = delta(2);
 
             g       = MAV.gravity; 
             e0      = self.state(7); 
@@ -126,7 +148,7 @@ classdef mav_dynamics < handle
             e3      = self.state(10);
             p       = self.state(11);
             q       = self.state(12);
-            r       = self.satte(13);
+            r       = self.state(13);
 
             V_a      = self.Va;
             aalpha   = self.alpha;
@@ -186,7 +208,7 @@ classdef mav_dynamics < handle
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            Cx      = -(Cdo + Cda*aalpha)*cos(alp) + (Clo + Cla*aalpha)*sin(aalpha);
+            Cx      = -(Cdo + Cda*aalpha)*cos(aalpha) + (Clo + Cla*aalpha)*sin(aalpha);
             Cxq     = -Cdq*cos(aalpha) + Clq*sin(aalpha);
             Cxde    = -Cddelta_e*cos(aalpha) + Cldelta_e*sin(aalpha);
 
@@ -196,11 +218,11 @@ classdef mav_dynamics < handle
 
             gx = -mass*g*(e1*e3 - e2*e0);
             gy = mass*g*(e2*e3 - e1*e0);
-            gz = mass*g(e3^2 + e0^2 - e1^2 - e2^2);
+            gz = mass*g*(e3^2 + e0^2 - e1^2 - e2^2);
 
-            fx = 0.5*den*V_a^2*Swing*(Cx + Cxq*c/(2*V_a)*q + Cxde*d_el);
-            fy = 0.5*den*V_a^2*Swing*(Cyo + Cybeta*bbeta + Cyp*b/(2*V_a)*p + Cyr*b/(2*V_a)*r + Cydelta_a*d_al + Cydelta_r*d_ru);
-            fz = 0.5*den*V_a^2*Swing*(Cz + Czq*c/(2*V_a)*q + Czde*d_el);
+            fx = 0.5*dens*V_a^2*Swing*(Cx + Cxq*c/(2*V_a)*q + Cxde*d_el);
+            fy = 0.5*dens*V_a^2*Swing*(Cyo + Cybeta*bbeta + Cyp*b/(2*V_a)*p + Cyr*b/(2*V_a)*r + Cydelta_a*d_al + Cydelta_r*d_ru);
+            fz = 0.5*dens*V_a^2*Swing*(Cz + Czq*c/(2*V_a)*q + Czde*d_el);
 
             px = 0.5*dens*Sprop*Cprop*((km*d_th)^2 - V_a^2);
             py = 0;
@@ -226,22 +248,23 @@ classdef mav_dynamics < handle
         end
         %----------------------------
         function self=update_true_state(self)
-            [phi, theta, psi] = Quaternion2Euler(self.state(7:10));
-            self.true_state.pn = self.state(1);  % pn
+            %[phi, theta, psi] = Quaternion2Euler(self.state(7:10));
+            e = quat2eul(self.state(7:10)');
+            self.true_state.pn = self.state(1);  % pn 
             self.true_state.pe = self.state(2);  % pd
             self.true_state.h = -self.state(3);  % h
-            self.true_state.phi = phi; % phi
-            self.true_state.theta = theta; % theta
-            self.true_state.psi = psi; % psi
+            self.true_state.phi = e(2); % phi
+            self.true_state.theta = e(3); % theta
+            self.true_state.psi = e(1); % psi
             self.true_state.p = self.state(11); % p
             self.true_state.q = self.state(12); % q
             self.true_state.r = self.state(13); % r
             self.true_state.Va = self.Va;
             self.true_state.alpha = self.alpha;
             self.true_state.beta = self.beta;
-            self.true_state.Vg = 
-            self.true_state.chi = 
-            self.true_state.gamma = 
+            self.true_state.Vg = sqrt(self.state(4)^2 + self.state(5)^2 + self.state(6)^2);
+            self.true_state.chi = 54;
+            self.true_state.gamma = 23;
             self.true_state.wn = self.wind(1);
             self.true_state.we = self.wind(2);
         end

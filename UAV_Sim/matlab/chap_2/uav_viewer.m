@@ -22,7 +22,7 @@ classdef uav_viewer < handle
                 ylabel('North');
                 zlabel('-Down');
                 view(32,47); 
-                axis([0,500,0,500,-500,100]);
+                axis([-300,500,-300,500,100,500]);
                 hold on;
                 grid on;
                 self.plot_initialized = 1;
