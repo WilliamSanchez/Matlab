@@ -60,70 +60,70 @@ function out = forces_moments(x, delta, wind, MAV)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    mass    = MAV.mass;
-    g       = MAV.gravity; 
+    mass        = MAV.mass;
+    g           = MAV.gravity; 
     
-    Swing   = MAV.S_wing;
-    Sprop   = MAV.S_prop;
-    Cprop   = MAV.C_prop;
-    dens    = MAV.rho;
-    km      = MAV.k_motor;
-    Kmo     = MAV.k_Omega;
-    Ktp     = MAV.k_T_P;
-    c       = MAV.c;
-    b       = MAV.b;
+    Swing       = MAV.S_wing;
+    Sprop       = MAV.S_prop;
+    Cprop       = MAV.C_prop;
+    dens        = MAV.rho;
+    km          = MAV.k_motor;
+    Kmo         = MAV.k_Omega;
+    Ktp         = MAV.k_T_P;
+    c           = MAV.c;
+    b           = MAV.b;
 
-            %%%   Coeficients forces
+    %%%   Coeficients forces
 
-    Clo     = MAV.C_L_0;
-    Cla     = MAV.C_L_alpha;
+    Clo         = MAV.C_L_0;
+    Cla         = MAV.C_L_alpha;
 
-    Cdo     = MAV.C_D_0;
-            Cda     = MAV.C_D_alpha;
-            Cdq     = MAV.C_D_q;
-            Clq     = MAV.C_L_q;
-            Cddelta_e   = MAV.C_D_delta_e;
-            Cldelta_e   = MAV.C_L_delta_e;
+    Cdo         = MAV.C_D_0;
+    Cda         = MAV.C_D_alpha;
+    Cdq         = MAV.C_D_q;
+    Clq         = MAV.C_L_q;
+    Cddelta_e   = MAV.C_D_delta_e;
+    Cldelta_e   = MAV.C_L_delta_e;
 
-            Cyo     = MAV.C_Y_0;
-            Cybeta  = MAV.C_Y_beta;
-            Cyp     = MAV.C_Y_p;
-            Cyr     = MAV.C_Y_r;
-            Cydelta_a   = MAV.C_Y_delta_a;
-            Cydelta_r   = MAV.C_Y_delta_r;
+    Cyo         = MAV.C_Y_0;
+    Cybeta      = MAV.C_Y_beta;
+    Cyp         = MAV.C_Y_p;
+    Cyr         = MAV.C_Y_r;
+    Cydelta_a   = MAV.C_Y_delta_a;
+    Cydelta_r   = MAV.C_Y_delta_r;
 
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            %%% Coefficients moments
+    %%% Coefficients moments
 
-            Cllo        = MAV.C_ell_0; 
-            Cllbeta     = MAV.C_ell_beta;
-            Cllp        = MAV.C_ell_p;
-            Cllr        = MAV.C_ell_r;
-            Clldelta_a  = MAV.C_ell_delta_a;
-            Clldelta_r  = MAV.C_ell_delta_r;
+     Cllo        = MAV.C_ell_0; 
+     Cllbeta     = MAV.C_ell_beta;
+     Cllp        = MAV.C_ell_p;
+     Cllr        = MAV.C_ell_r;
+     Clldelta_a  = MAV.C_ell_delta_a;
+     Clldelta_r  = MAV.C_ell_delta_r;
 
-            Cmo         = MAV.C_m_0;
-            Cma         = MAV.C_m_alpha;
-            Cmq         = MAV.C_m_q;
-            Cmdelta_e   = MAV.C_m_delta_e;
+     Cmo         = MAV.C_m_0;
+     Cma         = MAV.C_m_alpha;
+     Cmq         = MAV.C_m_q;
+     Cmdelta_e   = MAV.C_m_delta_e;
 
-            Cno         = MAV.C_n_0;
-            Cnbeta      = MAV.C_n_beta;
-            Cnp         = MAV.C_n_p;
-            Cnr         = MAV.C_n_r;
-            Cndelta_a   = MAV.C_n_delta_a;
-            Cndelta_r   = MAV.C_n_delta_r;
+     Cno         = MAV.C_n_0;
+     Cnbeta      = MAV.C_n_beta;
+     Cnp         = MAV.C_n_p;
+     Cnr         = MAV.C_n_r;
+     Cndelta_a   = MAV.C_n_delta_a;
+     Cndelta_r   = MAV.C_n_delta_r;
 
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            Cx      = -(Cdo + Cda*aalpha)*cos(aalpha) + (Clo + Cla*aalpha)*sin(aalpha);
-            Cxq     = -Cdq*cos(aalpha) + Clq*sin(aalpha);
-            Cxde    = -Cddelta_e*cos(aalpha) + Cldelta_e*sin(aalpha);
+     Cx      = -(Cdo + Cda*aalpha)*cos(aalpha) + (Clo + Cla*aalpha)*sin(aalpha);
+     Cxq     = -Cdq*cos(aalpha) + Clq*sin(aalpha);
+     Cxde    = -Cddelta_e*cos(aalpha) + Cldelta_e*sin(aalpha);
 
-            Cz      = -(Cdo + Cda*aalpha)*sin(aalpha) - (Clo + Cla*aalpha)*cos(aalpha);
-            Czq     = -Cdq*sin(aalpha) - Clq*cos(aalpha);
-            Czde    = -Cddelta_e*sin(aalpha) - Cldelta_e*cos(aalpha);
+     Cz      = -(Cdo + Cda*aalpha)*sin(aalpha) - (Clo + Cla*aalpha)*cos(aalpha);
+     Czq     = -Cdq*sin(aalpha) - Clq*cos(aalpha);
+     Czde    = -Cddelta_e*sin(aalpha) - Cldelta_e*cos(aalpha);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

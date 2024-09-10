@@ -16,6 +16,7 @@ classdef mav_dynamics < handle
             self.ts_simulation = Ts; % time step between function calls
             self.state = [MAV.pn0; MAV.pe0; MAV.pd0; MAV.u0; MAV.v0; MAV.w0;...
                 MAV.e0; MAV.e1; MAV.e2; MAV.e3; MAV.p0; MAV.q0; MAV.r0];
+
             self.Va = 10;
             self.alpha = 2; 
             self.beta = 0.4;
@@ -248,14 +249,13 @@ classdef mav_dynamics < handle
         end
         %----------------------------
         function self=update_true_state(self)
-            %[phi, theta, psi] = Quaternion2Euler(self.state(7:10));
-            e = quat2eul(self.state(7:10)');
+            [phi, theta, psi] = Quaternion2Euler(self.state(7:10));
             self.true_state.pn = self.state(1);  % pn 
             self.true_state.pe = self.state(2);  % pd
             self.true_state.h = -self.state(3);  % h
-            self.true_state.phi = e(2); % phi
-            self.true_state.theta = e(3); % theta
-            self.true_state.psi = e(1); % psi
+            self.true_state.phi = phi;
+            self.true_state.theta = theta;
+            self.true_state.psi = psi;
             self.true_state.p = self.state(11); % p
             self.true_state.q = self.state(12); % q
             self.true_state.r = self.state(13); % r
