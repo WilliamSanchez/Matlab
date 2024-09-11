@@ -1,7 +1,7 @@
 function [sys, x0, str, ts] = second_order_m(t,x,u,flag,zeta,wn) 
     switch flag
         case 0
-            [sys,x0,str,ts] = mdlInitializeSizes(t,x,u,zeta,wn);
+            [sys,x0,str,ts] = mdlInitializeSizes;
         case 1
             sys = mdlDerivatives(t,x,u,zeta,wn);
         case 3
