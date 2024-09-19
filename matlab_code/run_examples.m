@@ -3,7 +3,7 @@
 addpath("../Simulink_code/")
 
 for i=0.0: 0.1: 10
-    u = [10*0.5, i*45*pi/180, i];
+    u = [1, 0.05*i*45*pi/180, i];
     drawPendulum(u);
     pause(0.1);
 end
@@ -30,7 +30,8 @@ myfunc([1;3],3)
 mycon([1;2],5)
 a1 = 2; a2 = 1.5;
 options = optimoptions('fmincon','Algorithm','interior-point');
-x = fmincon(@(x) myfunc(x,a1),[1;2],[],[],[],[],[],[],@(x) mycon(x,a2),options)
+%x = fmincon(@(x) myfunc(x,a1),[1;2],[],[],[],[],[],[],@(x) mycon(x,a2),options)
+x = fmincon(@myfunc,[1;2],[],[],[],[],[],[],@mycon,[],5)
 
 
 

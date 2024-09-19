@@ -14,12 +14,11 @@ end
 function [sys, x0, str, ts] = mdlInitializeSizes
     sizes = simsizes;
     sizes.NumContStates = 2;
-    sizes.NumDiscState = 0;
+    sizes.NumDiscStates = 0;
     sizes.NumOutputs = 1;
-    sizes.NumInpuits = 1;
-    sizes.DirFeedthroug = 0;
-    sizes.NumSamplesTimes = 1;
-
+    sizes.NumInputs = 1;
+    sizes.DirFeedthrough = 0;
+    sizes.NumSampleTimes = 1;
     sys = simsizes(sizes);
     x0 = [0,0];
     str = [];

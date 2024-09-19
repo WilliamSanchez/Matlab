@@ -5,9 +5,9 @@ function [x_trim, u_trim] = compute_trim(mav, Va, gamma, MAV)
     %                                   (-) for left handed orbit
 
     % define initial state and input
-    addpath('../tools');
-    state0 = 
-    delta0 = 
+    addpath('../../tools/');
+    state0 = [];
+    delta0 = [0;0;0;1]; 
     x0 = [ state0; delta0 ];
     xstar = fmincon(@trim_objective, x0, [], [],...
                     [], [], [], [], @trim_constraints, [],...
@@ -23,6 +23,8 @@ end
 
 % nonlinear constraints for trim optimization
 function [c, ceq] = trim_constraints(x, mav, Va, gamma, MAV)
+
+    ceq = [];
 end
 
 

@@ -4,12 +4,13 @@
 %     - Update history:  
 %         2/5/2019 - RWB
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-run('../parameters/simulation_parameters')  % load SIM: simulation parameters
-run('../parameters/aerosonde_parameters')  % load MAV: aircraft parameters
+run('../../parameters/simulation_parameters')  % load SIM: simulation parameters
+run('../../parameters/aerosonde_parameters')  % load MAV: aircraft parameters
+run('../../parameters/wind_parameters')
 
 % initialize the mav viewer
-addpath('../chap2'); mav_view = mav_viewer();  
-addpath('../chap3'); data_view = data_viewer();
+addpath('../../chap_2'); mav_view = uav_viewer();  
+addpath('../../chap_3'); data_view = data_viewer();
 
 % initialize the video writer
 VIDEO = 0;  % 1 means write video, 0 means don't write video
@@ -18,12 +19,12 @@ if VIDEO==1
 end
 
 % initialize elements of the architecture
-addpath('../chap4'); 
-wind = wind_simulation(SIM.ts_simulation);
+addpath('../../chap_4'); 
+wind = wind_simulation(SIM.ts_simulation,WIND);
 mav = mav_dynamics(SIM.ts_simulation, MAV);
 
 % compute trim
-addpath('../chap5');
+addpath('../../chap_5');
 Va = 25;
 gamma = 0*pi/180;
 [trim_state, trim_input] = compute_trim(mav, Va, gamma, MAV);

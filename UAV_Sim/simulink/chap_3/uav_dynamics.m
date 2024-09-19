@@ -66,9 +66,9 @@ function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes(MAV)
 %
 sizes = simsizes;
 
-sizes.NumContStates  = 12;
+sizes.NumContStates  = 13;
 sizes.NumDiscStates  = 0;
-sizes.NumOutputs     = 12;
+sizes.NumOutputs     = 13;
 sizes.NumInputs      = 6;
 sizes.DirFeedthrough = 0;
 sizes.NumSampleTimes = 1;   % at least one sample time is needed
@@ -85,9 +85,10 @@ x0  = [...
     MAV.u0;...
     MAV.v0;...
     MAV.w0;...
-    MAV.phi0;...
-    MAV.theta0;...
-    MAV.psi0;...
+    MAV.e0;...
+    MAV.e1;...
+    MAV.e2;...
+    MAV.e3;...
     MAV.p0;...
     MAV.q0;...
     MAV.r0;...
@@ -137,12 +138,13 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     u     = x(4);
     v     = x(5);
     w     = x(6);
-    phi   = x(7);
-    theta = x(8);
-    psi   = x(9);
-    p     = x(10);
-    q     = x(11);
-    r     = x(12);
+    e0    = x(7);
+    e1    = x(8);
+    e2    = x(9);
+    e3    = x(10);
+    p     = x(11);
+    q     = x(12);
+    r     = x(13);
     fx    = uu(1);
     fy    = uu(2);
     fz    = uu(3);
@@ -151,24 +153,24 @@ function sys=mdlDerivatives(t,x,uu, MAV)
     n     = uu(6);
     
      % position kinematics
-     
-    pndot = cos(theta)*cos(psi)*u + (sin(phi)*sin(theta)*cos(psi)-cos(phi)*sin(psi))*v + (cos(phi)*sin(theta)*cos(psi)+sin(phi)*sin(psi))*w;
-    pedot = cos(theta)*sin(psi)*u + (sin(phi)*sin(theta)*sin(psi)+cos(phi)*cos(psi))*v + (cos(phi)*sin(theta)*sin(psi)-sin(phi)*cos(psi))*w;
-    pddot = -sin(theta)*u + sin(phi)*cos(theta)*v + cos(phi)*cos(theta)*w;
+    pndot = (e1^2+e0^2-e2^2-e3^2)*u + 2*(e1*e2-e3*e0)*v + 2*(e1*e3+e2*e0)*w;    
+    pedot = 2*(e1*e2+e3*e0)*u + (e2^2+e0^2-e1^2-e3^2)*v + 2*(e2*e3-e1*e0)*w;   
+    pddot = 2*(e1*e3-e2*e0)*u + 2*(e2*e3+e1*e0)*v + (e3^2+e0^2-e1^2-e2^2)*w;
     % position dynamics
     udot =  r*v - q*w + fx/mass;   
     vdot =  p*w - r*u + fy/mass;   
     wdot =  q*u - p*v + fz/mass;
     % rotational kinematics
-    phidot = p + sin(psi)*tan(theta)*q + cos(psi)*tan(theta)*r;
-    thetadot = cos(psi)*q - sin(psi)*r;
-    psidot = sin(psi)*q/cos(theta) + cos(psi)/cos(theta)*r;
+    e0dot = 0.5*(-p*e1 - q*e2 - r*e3);
+    e1dot = 0.5*( p*e0 + r*e2 - q*e3);
+    e2dot = 0.5*( q*e0 - r*e1 + p*e3);
+    e3dot = 0.5*( r*e0 + q*e1 - p*e2);
     % rotational dynamics
     pdot = r1*p*q - r2*q*r + r3*ell + r4*n;    
     qdot = r5*p*r - r6*(p^2 - r^2) + m/MAV.Jy;
     rdot = r7*p*q - r1*q*r + r4*ell + r8*n;       
 
-sys = [pndot; pedot; pddot; udot; vdot; wdot; phidot; thetadot; psidot; pdot; qdot; rdot];
+sys = [pndot; pedot; pddot; udot; vdot; wdot; e0dot; e1dot; e2dot; e3dot; pdot; qdot; rdot];
 
 % end mdlDerivatives
 
@@ -205,6 +207,7 @@ function sys=mdlOutputs(t,x)
             x(10);
             x(11);
             x(12);
+            x(13);
 
         ];
 sys = y;
